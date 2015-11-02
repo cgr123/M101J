@@ -58,7 +58,7 @@ public class SessionDAO {
 
         // build the BSON object
         Document session = new Document("username", username)
-                           .append("_id", sessionID);
+                .append("_id", sessionID);
 
         sessionsCollection.insertOne(session);
 
