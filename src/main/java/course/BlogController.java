@@ -1,19 +1,3 @@
-/*
- * Copyright 2015 MongoDB, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package course;
 
 import com.mongodb.MongoClient;
@@ -146,7 +130,7 @@ public class BlogController {
                     SimpleHash root = new SimpleHash();
 
                     root.put("post", post);
-                    root.put("comments", newComment);
+                    root.put("comment", newComment);
 
                     template.process(root, writer);
                 }
@@ -209,27 +193,6 @@ public class BlogController {
                 root.put("verify_error", "");
 
                 template.process(root, writer);
-            }
-        });
-
-        get(new FreemarkerBasedRoute("/welcome", "welcome.ftl") {
-            @Override
-            protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
-
-                String cookie = getSessionCookie(request);
-                String username = sessionDAO.findUserNameBySessionId(cookie);
-
-                if (username == null) {
-                    System.out.println("welcome() can't identify the user, redirecting to signup");
-                    response.redirect("/signup");
-                }
-                else {
-                    SimpleHash root = new SimpleHash();
-
-                    root.put("username", username);
-
-                    template.process(root, writer);
-                }
             }
         });
 
@@ -404,6 +367,29 @@ public class BlogController {
                 }
             }
         });
+
+        // Show the posts filed under a certain tag
+        get(new FreemarkerBasedRoute("/tag/:thetag", "blog_template.ftl") {
+            @Override
+            protected void doHandle(Request request, Response response, Writer writer)
+                    throws IOException, TemplateException {
+
+                String username = sessionDAO.findUserNameBySessionId(getSessionCookie(request));
+                SimpleHash root = new SimpleHash();
+
+                String tag = StringEscapeUtils.escapeHtml4(request.params(":thetag"));
+                List<Document> posts = blogPostDAO.findByTagDateDescending(tag);
+
+                root.put("myposts", posts);
+                if (username != null) {
+                    root.put("username", username);
+                }
+
+                template.process(root, writer);
+            }
+        });
+
+
 
         // tells the user that the URL is dead
         get(new FreemarkerBasedRoute("/post_not_found", "post_not_found.ftl") {

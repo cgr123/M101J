@@ -25,6 +25,9 @@
         <module name="M101J" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="M101J" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 

@@ -8,41 +8,38 @@
 <#if username??>
 Welcome ${username} <a href="/logout">Logout</a> | <a href="/newpost">New Post</a>
 
-<#else>
-Welcome Guest <a href="/signup">Signup</a>
-</#if>
 <p>
+<#else>
+    Welcome guest <a href="/signup"> Sign up </a> | <a href="/login">Log in</a>
+</#if>
 
 <h1>My Blog</h1>
 
-<#if myposts?has_content>
+<#list myposts as post>
+<h2><a href="/post/${post["permalink"]}">${post["title"]}</a></h2>
+Posted ${post["date"]?datetime} <i>By ${post["author"]}</i><br>
+Comments:
+    <#if post["comments"]??>
+        <#assign numComments = post["comments"]?size>
+    <#else>
+        <#assign numComments = 0>
+    </#if>
 
-    <#list myposts as post>
-    <h2><a href="/post/${post["permalink"]}">${post["title"]}</a></h2>
-    Posted ${post["date"]?datetime} <i>By ${post["author"]}</i><br>
-    Comments:
-        <#if post["comments"]??>
-            <#assign numComments = post["comments"]?size>
-        <#else>
-            <#assign numComments = 0>
-        </#if>
+<a href="/post/${post["permalink"]}">${numComments}</a>
+<hr>
+${post["body"]!""}
+<p>
 
-    <a href="/post/${post["permalink"]}">${numComments}</a>
-    <hr>
-    ${post["body"]!""}
-    <p>
+<p>
+    <em>Filed Under</em>:
+    <#if post["tags"]??>
+        <#list post["tags"] as tag>
+            <a href="/tag/${tag}">${tag}</a>
+        </#list>
+    </#if>
 
-    <p>
-        <em>Filed Under</em>:
-        <#if post["tags"]??>
-            <#list post["tags"] as tag>
-            ${tag}
-            </#list>
-        </#if>
-
-    <p>
-    </#list>
-</#if>
+<p>
+</#list>
 </body>
 </html>
 
